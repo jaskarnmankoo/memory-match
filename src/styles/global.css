@@ -23,3 +23,46 @@
 body {
   font-family: 'Rubik', sans-serif;
 }
+
+.back {
+  background-image: url('../assets/logo.svg');
+}
+
+.c {
+  border-radius: 10px;
+  border: 2px solid #000;
+  cursor: pointer;
+  height: 50ch;
+  max-height: 160px;
+  max-width: 160px;
+  position: absolute;
+  width: 50ch;
+  will-change: transform, opacity;
+}
+
+.card {
+  height: 160px;
+  margin-bottom: 20px;
+  width: 160px;
+}
+
+.card:not(:nth-child(6n)) {
+  margin-right: 20px;
+}
+
+.front,
+.back {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+@media (prefers-color-scheme: dark) {
+  .back {
+    background-image: url('../assets/dark-mode/logo.svg');
+  }
+
+  .c {
+    border: 2px solid #fff;
+  }
+}

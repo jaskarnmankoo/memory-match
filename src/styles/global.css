@@ -25,7 +25,9 @@ body {
 }
 
 .back {
-  background-image: url('../assets/logo.svg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .c {
@@ -50,18 +52,7 @@ body {
   margin-right: 20px;
 }
 
-.front,
-.back {
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
 @media (prefers-color-scheme: dark) {
-  .back {
-    background-image: url('../assets/dark-mode/logo.svg');
-  }
-
   .c {
     border: 2px solid #fff;
   }

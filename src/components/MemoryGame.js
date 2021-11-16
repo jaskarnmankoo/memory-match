@@ -2,12 +2,16 @@ import * as React from 'react';
 
 import Card from './Card';
 
+import useDarkMode from '../hooks/useDarkMode';
+
 export default function MemoryGame({
   options,
   setOptions,
   highScore,
   setHighScore
 }) {
+  const darkMode = useDarkMode(null);
+
   const [game, setGame] = React.useState([]);
   const [flippedCount, setFlippedCount] = React.useState(0);
   const [flippedIndexes, setFlippedIndexes] = React.useState([]);
@@ -132,6 +136,7 @@ export default function MemoryGame({
               setFlippedCount={setFlippedCount}
               flippedIndexes={flippedIndexes}
               setFlippedIndexes={setFlippedIndexes}
+              darkMode={darkMode}
             />
           </div>
         ))}

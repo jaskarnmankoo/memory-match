@@ -2,6 +2,9 @@ import * as React from 'react';
 
 import { useSpring, animated } from 'react-spring';
 
+import logo from '../assets/logo.svg';
+import logoDark from '../assets/dark-mode/logo.svg';
+
 export default function Card({
   id,
   color,
@@ -9,7 +12,8 @@ export default function Card({
   flippedCount,
   setFlippedCount,
   flippedIndexes,
-  setFlippedIndexes
+  setFlippedIndexes,
+  darkMode
 }) {
   const [flipped, set] = React.useState(false);
   const { transform, opacity } = useSpring({
@@ -53,10 +57,11 @@ export default function Card({
   };
 
   return (
-    <button onClick={onCardClick}>
+    <button onClick={onCardClick} aria-label="card">
       <animated.div
         className="c back"
         style={{
+          backgroundImage: `url(${darkMode ? logoDark : logo})`,
           opacity: opacity.to((o) => 1 - o),
           transform
         }}

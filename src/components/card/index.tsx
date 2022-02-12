@@ -2,19 +2,32 @@ import * as React from 'react';
 
 import { useSpring, animated } from 'react-spring';
 
-import logo from '../assets/logo.svg';
-import logoDark from '../assets/dark-mode/logo.svg';
+import { Deck } from '../../pages/index';
+
+import logo from '../../assets/logo.svg';
+import logoDark from '../../assets/dark-mode/logo.svg';
+
+interface Props {
+  color: string;
+  darkMode: boolean;
+  flippedCount: number;
+  flippedIndexes: (number | boolean)[];
+  game: Deck[];
+  id: number;
+  setFlippedCount: React.Dispatch<React.SetStateAction<number>>;
+  setFlippedIndexes: React.Dispatch<React.SetStateAction<(number | boolean)[]>>;
+}
 
 export default function Card({
-  id,
   color,
-  game,
+  darkMode,
   flippedCount,
-  setFlippedCount,
   flippedIndexes,
-  setFlippedIndexes,
-  darkMode
-}) {
+  game,
+  id,
+  setFlippedCount,
+  setFlippedIndexes
+}: Props) {
   const [flipped, set] = React.useState(false);
   const { transform, opacity } = useSpring({
     opacity: flipped ? 1 : 0,
@@ -33,10 +46,9 @@ export default function Card({
       setFlippedCount(flippedCount + 1);
       setFlippedIndexes([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flippedIndexes]);
+  }, [flippedCount, flippedIndexes, id, setFlippedCount, setFlippedIndexes]);
 
-  const onCardClick = () => {
+  const onCardClick = React.useCallback(() => {
     if (!game[id].flipped && flippedCount % 3 === 0) {
       set((state) => !state);
       setFlippedCount(flippedCount + 1);
@@ -54,10 +66,17 @@ export default function Card({
       newIndexes.push(id);
       setFlippedIndexes(newIndexes);
     }
-  };
+  }, [
+    flippedCount,
+    flippedIndexes,
+    game,
+    id,
+    setFlippedCount,
+    setFlippedIndexes
+  ]);
 
   return (
-    <button onClick={onCardClick} aria-label="card">
+    <button onClick={onCardClick} aria-label="card" type="button">
       <animated.div
         className="c back"
         style={{

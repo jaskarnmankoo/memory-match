@@ -18,6 +18,7 @@ interface Props {
   setFlippedIndexes: React.Dispatch<React.SetStateAction<(number | boolean)[]>>;
 }
 
+/** Renders a Card in Memory Match */
 export default function Card({
   color,
   darkMode,

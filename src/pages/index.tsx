@@ -14,6 +14,7 @@ export interface Deck {
   flipped: boolean;
 }
 
+/** Renders the Memory Match game */
 export default function Home(): JSX.Element {
   const darkMode = useDarkMode(false);
 

@@ -72,7 +72,7 @@ export default function Home(): JSX.Element {
 
         const pointsLost = multiplier * (0.66 * flippedCount - bestPossible);
 
-        let score;
+        let score = 0;
         if (pointsLost < 100) {
           score = 100 - pointsLost;
         } else {
@@ -180,7 +180,10 @@ export default function Home(): JSX.Element {
             <div className="flex w-full flex-wrap text-left md:justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
                 {game.map((card, index) => (
-                  <div className="card" key={`${card.id}${card.color}`}>
+                  <div
+                    className="card"
+                    key={`${String(card.id)}${String(card.color)}`}
+                  >
                     <Card
                       color={card.color}
                       darkMode={darkMode}

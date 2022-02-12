@@ -80,7 +80,7 @@ export default function Card({
       <animated.div
         className="c back"
         style={{
-          backgroundImage: `url(${darkMode ? logoDark : logo})`,
+          backgroundImage: `url(${darkMode ? String(logoDark) : String(logo)})`,
           opacity: opacity.to((o) => 1 - o),
           transform
         }}
@@ -89,7 +89,7 @@ export default function Card({
         className="c"
         style={{
           opacity,
-          transform: transform.to((t) => `${t} rotateX(180deg)`),
+          transform: transform.to((t) => `${String(t)} rotateX(180deg)`),
           background: color
         }}
       />

@@ -82,8 +82,8 @@ export default function Home(): JSX.Element {
 
         let localWon = true;
 
-        for (const card in deckCopy) {
-          if (!deckCopy[card].flipped) {
+        for (const card of deckCopy) {
+          if (!card.flipped) {
             localWon = false;
             break;
           }

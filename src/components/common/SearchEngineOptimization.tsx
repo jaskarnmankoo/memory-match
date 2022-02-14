@@ -3,7 +3,16 @@ import * as React from 'react';
 import { useStaticQuery, graphql } from 'gatsby';
 import { Helmet } from 'react-helmet';
 
-export default function SearchEngineOptimization({ lang = 'en', title }) {
+interface Props {
+  lang?: string;
+  title: string;
+}
+
+/** Creates Search Engine Optimization when specified on a page */
+export default function SearchEngineOptimization({
+  lang = 'en',
+  title
+}: Props): JSX.Element {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -12,6 +21,7 @@ export default function SearchEngineOptimization({ lang = 'en', title }) {
             title
             description
             author
+            contact
           }
         }
       }
@@ -46,6 +56,19 @@ export default function SearchEngineOptimization({ lang = 'en', title }) {
           content: site.siteMetadata.description
         }
       ]}
-    />
+    >
+      <script type="application/ld+json">
+        {JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: site.siteMetadata.title,
+          contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: site.siteMetadata.contact,
+            contactType: 'Customer service'
+          }
+        })}
+      </script>
+    </Helmet>
   );
 }

@@ -165,8 +165,9 @@ export default function Home(): JSX.Element {
                       color={card.color}
                       darkMode={darkMode}
                       flipped={deck[index].flipped}
+                      index={index}
                       waiting={waiting}
-                      onClick={() => onCardClick(index)}
+                      onClick={onCardClick}
                     />
                   </div>
                 ))}

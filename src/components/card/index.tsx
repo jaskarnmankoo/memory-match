@@ -9,8 +9,9 @@ interface Props {
   color: string;
   darkMode: boolean;
   flipped: boolean;
+  index: number;
   waiting: boolean;
-  onClick: () => void;
+  onClick: (index: number) => void;
 }
 
 /** Renders a Card in Memory Match */
@@ -18,6 +19,7 @@ export default function Card({
   color,
   darkMode,
   flipped,
+  index,
   waiting,
   onClick
 }: Props): JSX.Element {
@@ -27,9 +29,11 @@ export default function Card({
     config: { mass: 5, tension: 500, friction: 80 }
   });
 
+  const onCardClick = React.useCallback(() => onClick(index), [index, onClick]);
+
   return (
     <button
-      onClick={onClick}
+      onClick={onCardClick}
       disabled={flipped || waiting}
       aria-label="card"
       type="button"

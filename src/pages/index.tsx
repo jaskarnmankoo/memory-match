@@ -7,7 +7,7 @@ import useDarkMode from '../hooks/useDarkMode';
 
 import { COLORS } from '../utils';
 
-export interface Deck {
+export interface Card {
   id: number;
   colorId: number;
   color: string;
@@ -18,118 +18,93 @@ export interface Deck {
 export default function Home(): JSX.Element {
   const darkMode = useDarkMode(false);
 
-  const [game, setGame] = React.useState<Deck[]>([]);
-  const [flippedCount, setFlippedCount] = React.useState(0);
-  const [flippedIndexes, setFlippedIndexes] = React.useState<
-    (boolean | number)[]
-  >([]);
-  const [options, setOptions] = React.useState(0);
+  const [deck, setDeck] = React.useState<Card[]>([]);
+  const [difficulty, setDifficulty] = React.useState(0);
+  const [flippedIndexes, setFlippedIndexes] = React.useState<number[]>([]);
+  const [waiting, setWaiting] = React.useState(false);
+  const [won, setWon] = React.useState(false);
 
-  const highScore = React.useRef(0);
+  const shuffle = React.useCallback((times: number) => {
+    const newDeck = [];
 
-  React.useEffect(() => {
-    const json = localStorage.getItem('memorygamehighscore');
-    if (json) highScore.current = JSON.parse(json);
+    for (let i = 0; i < times / 2; i++) {
+      newDeck.push(
+        { id: 2 * i, colorId: i, color: COLORS[i], flipped: false },
+        { id: 2 * i + 1, colorId: i, color: COLORS[i], flipped: false }
+      );
+    }
+
+    const shuffledDeck = newDeck.sort(() => Math.random() - 0.5);
+    setDeck(shuffledDeck);
+    setWon(false);
   }, []);
 
+  const goToMenu = React.useCallback(() => setDifficulty(0), []);
+
+  const startEasyGame = React.useCallback(() => {
+    shuffle(12);
+    setDifficulty(12);
+  }, [shuffle]);
+
+  const startMediumGame = React.useCallback(() => {
+    shuffle(18);
+    setDifficulty(18);
+  }, [shuffle]);
+
+  const startHardGame = React.useCallback(() => {
+    shuffle(24);
+    setDifficulty(24);
+  }, [shuffle]);
+
+  const onCardClick = React.useCallback(
+    (index: number) => {
+      const deckCopy = [...deck];
+      deckCopy[index].flipped = true;
+      setFlippedIndexes([...flippedIndexes, index]);
+      setDeck(deckCopy);
+    },
+    [deck, flippedIndexes]
+  );
+
   React.useEffect(() => {
-    const newGame = [];
-    for (let i = 0; i < options / 2; i++) {
-      const firstOption = {
-        id: 2 * i,
-        colorId: i,
-        color: COLORS[i],
-        flipped: false
-      };
-      const secondOption = {
-        id: 2 * i + 1,
-        colorId: i,
-        color: COLORS[i],
-        flipped: false
-      };
+    if (flippedIndexes.length === 2) {
+      setWaiting(true);
 
-      newGame.push(firstOption);
-      newGame.push(secondOption);
-    }
-
-    const shuffledGame = newGame.sort(() => Math.random() - 0.5);
-    setGame(shuffledGame);
-  }, [options]);
-
-  React.useEffect(() => {
-    const finished = !game.some((card) => !card.flipped);
-    if (finished && game.length > 0) {
       setTimeout(() => {
-        const bestPossible = game.length;
-        let multiplier = 5;
+        const deckCopy = [...deck];
 
-        if (options === 12) {
-          multiplier = 5;
-        } else if (options === 18) {
-          multiplier = 2.5;
-        } else if (options === 24) {
-          multiplier = 1;
+        if (
+          deck[flippedIndexes[0]].colorId !== deck[flippedIndexes[1]].colorId
+        ) {
+          deckCopy[flippedIndexes[0]].flipped = false;
+          deckCopy[flippedIndexes[1]].flipped = false;
         }
 
-        const pointsLost = multiplier * (0.66 * flippedCount - bestPossible);
+        let localWon = true;
 
-        let score = 0;
-        if (pointsLost < 100) {
-          score = 100 - pointsLost;
-        } else {
-          score = 0;
+        for (const card in deckCopy) {
+          if (!deckCopy[card].flipped) {
+            localWon = false;
+            break;
+          }
         }
 
-        if (score > highScore.current) {
-          highScore.current = score;
-          localStorage.setItem('memorygamehighscore', JSON.stringify(score));
+        if (localWon) {
+          setWon(true);
         }
 
-        alert(`You Win! Score: ${score}`);
-        setOptions(0);
+        setDeck(deckCopy);
+        setFlippedIndexes([]);
+        setWaiting(false);
       }, 500);
     }
-  }, [flippedCount, game, options]);
-
-  const goToMenu = React.useCallback(() => setOptions(0), []);
-
-  const startEasyGame = React.useCallback(() => setOptions(12), []);
-
-  const startMediumGame = React.useCallback(() => setOptions(18), []);
-
-  const startHardGame = React.useCallback(() => setOptions(24), []);
-
-  if (flippedIndexes.length === 2) {
-    if (
-      typeof flippedIndexes[0] !== 'boolean' &&
-      typeof flippedIndexes[1] !== 'boolean'
-    ) {
-      const match =
-        game[flippedIndexes[0]].colorId === game[flippedIndexes[1]].colorId;
-
-      if (match) {
-        const newGame = [...game];
-        newGame[flippedIndexes[0]].flipped = true;
-        newGame[flippedIndexes[1]].flipped = true;
-        setGame(newGame);
-
-        const newIndexes = [...flippedIndexes];
-        newIndexes.push(false);
-        setFlippedIndexes(newIndexes);
-      } else {
-        const newIndexes = [...flippedIndexes];
-        newIndexes.push(true);
-        setFlippedIndexes(newIndexes);
-      }
-    }
-  }
+  }, [deck, flippedIndexes]);
 
   return (
     <>
       <SearchEngineOptimization title="Home" />
       <main className="grid grid-cols-1 text-center">
-        <p>High Score: {highScore.current}</p>
-        {!options ? (
+        {!difficulty ? (
           <>
             <p className="text-center text-xl">Choose a difficulty level...</p>
             <div className="grid grid-cols-3">
@@ -158,16 +133,17 @@ export default function Home(): JSX.Element {
           </>
         ) : (
           <>
+            {won && <h1>You win!</h1>}
             <div className="grid grid-cols-2">
               <button
                 type="button"
                 className="game-mode"
                 onClick={
-                  options === 12
+                  difficulty === 12
                     ? startEasyGame
-                    : options === 18
+                    : difficulty === 18
                     ? startMediumGame
-                    : options === 24
+                    : difficulty === 24
                     ? startHardGame
                     : undefined
                 }
@@ -180,7 +156,7 @@ export default function Home(): JSX.Element {
             </div>
             <div className="flex w-full flex-wrap text-left md:justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
-                {game.map((card, index) => (
+                {deck.map((card, index) => (
                   <div
                     className="card"
                     key={`${String(card.id)}${String(card.color)}`}
@@ -188,12 +164,9 @@ export default function Home(): JSX.Element {
                     <Card
                       color={card.color}
                       darkMode={darkMode}
-                      flippedCount={flippedCount}
-                      flippedIndexes={flippedIndexes}
-                      game={game}
-                      id={index}
-                      setFlippedCount={setFlippedCount}
-                      setFlippedIndexes={setFlippedIndexes}
+                      flipped={deck[index].flipped}
+                      waiting={waiting}
+                      onClick={() => onCardClick(index)}
                     />
                   </div>
                 ))}
